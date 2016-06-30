@@ -1,9 +1,12 @@
+module PressReleases exposing (..)
+
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as Json
+import Json.Decode.Pipeline exposing (decode, required, optional)
 import Task
 
 
@@ -25,6 +28,9 @@ type alias Model =
   { topic : String
   , gifUrl : String
   }
+
+
+type alias Article = { title : String, body : String, link : String }
 
 
 init : String -> (Model, Cmd Msg)
@@ -96,3 +102,16 @@ getRandomGif topic =
 decodeGifUrl : Json.Decoder String
 decodeGifUrl =
   Json.at ["data", "image_url"] Json.string
+
+
+articlesDecoder : Json.Decoder (List Article)
+articlesDecoder =
+    Json.list articleDecoder
+
+
+articleDecoder : Json.Decoder Article
+articleDecoder =
+  decode Article
+    |> Json.Decode.Pipeline.required "title" Json.string
+    |> Json.Decode.Pipeline.required "body" Json.string
+    |> optional "link" Json.string ""
