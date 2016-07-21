@@ -10,58 +10,48 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import Task
 
 
-
 main =
   Html.program
-    { init = init "cats"
+    { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions
     }
 
 
-
 -- MODEL
 
 
-type alias Model =
-  { topic : String
-  , gifUrl : String
-  }
+type alias Model = { articles : List Article }
 
 
 type alias Article = { title : String, body : String, link : String }
 
 
-init : String -> (Model, Cmd Msg)
-init topic =
-  ( Model topic "waiting.gif"
-  , getRandomGif topic
-  )
-
+init : (Model, Cmd Msg)
+init =
+  ( Model [{title = "My Title", body = "My text", link = "http://google.com"}]
+    , getArticles
+   )
 
 
 -- UPDATE
 
 
 type Msg
-  = MorePlease
-  | FetchSucceed String
+  = FetchSucceed Model
   | FetchFail Http.Error
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    MorePlease ->
-      (model, getRandomGif model.topic)
 
-    FetchSucceed newUrl ->
-      (Model model.topic newUrl, Cmd.none)
+    FetchSucceed model ->
+      (model, Cmd.none)
 
     FetchFail _ ->
       (model, Cmd.none)
-
 
 
 -- VIEW
@@ -70,10 +60,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ h2 [] [text model.topic]
-    , button [ onClick MorePlease ] [ text "More Please!" ]
+    [ h2 [] [text "test"]
     , br [] []
-    , img [src model.gifUrl] []
+    , img [src "/test.gif"] []
     ]
 
 
@@ -86,27 +75,21 @@ subscriptions model =
   Sub.none
 
 
-
 -- HTTP
 
 
-getRandomGif : String -> Cmd Msg
-getRandomGif topic =
+getArticles : Cmd Msg
+getArticles =
   let
     url =
-      "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
+      "http://localhost:3000/press"
   in
-    Task.perform FetchFail FetchSucceed (Http.get decodeGifUrl url)
+    Task.perform FetchFail FetchSucceed (Http.get articlesDecoder url)
 
 
-decodeGifUrl : Json.Decoder String
-decodeGifUrl =
-  Json.at ["data", "image_url"] Json.string
-
-
-articlesDecoder : Json.Decoder (List Article)
+articlesDecoder : Json.Decoder Model
 articlesDecoder =
-    Json.list articleDecoder
+    Model (Json.list articleDecoder)
 
 
 articleDecoder : Json.Decoder Article
