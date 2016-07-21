@@ -30,7 +30,7 @@ type alias Article = { title : String, body : String, link : String }
 
 init : (Model, Cmd Msg)
 init =
-  ( Model [{title = "My Title", body = "My text", link = "http://google.com"}]
+  ( Model []
     , getArticles
    )
 
@@ -88,7 +88,7 @@ getArticles =
 
 articlesDecoder : Json.Decoder Model
 articlesDecoder =
-    Model (Json.list articleDecoder)
+    decode (Model (Json.list articleDecoder))
 
 
 articleDecoder : Json.Decoder Article
