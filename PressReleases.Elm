@@ -59,6 +59,9 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
+  let
+    x = Debug.log "model" model
+  in
   div []
     [ h2 [] [text "test"]
     , br [] []
@@ -86,9 +89,11 @@ getArticles =
     Task.perform FetchFail FetchSucceed (Http.get articlesDecoder url)
 
 
-articlesDecoder : Json.Decoder Model
+articlesDecoder : Json.Decoder (Model)
 articlesDecoder =
-    decode (Model (Json.list articleDecoder))
+    articleDecoder
+    |> Json.list
+    |> Json.map Model
 
 
 articleDecoder : Json.Decoder Article
