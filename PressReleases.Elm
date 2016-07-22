@@ -60,13 +60,31 @@ update msg model =
 view : Model -> Html Msg
 view model =
   let
-    x = Debug.log "model" model
+    pressReleaseList =
+      List.map (\article -> pressRelease article) model.articles
   in
   div []
-    [ h2 [] [text "test"]
-    , br [] []
-    , img [src "/test.gif"] []
-    ]
+      pressReleaseList
+
+
+pressRelease : Article -> Html a
+pressRelease article =
+  div [ class "row" ]
+      [ div [ class "col-md-12" ]
+        [ p []
+            []
+        , h3 []
+            [ text article.title ]
+        , text article.body
+        , p []
+            []
+        , p []
+            [ text "Read more: "
+            , a [ href article.link, target "_blank" ]
+                [ text article.link ]
+            ]
+        ]
+      ]
 
 
 -- SUBSCRIPTIONS
@@ -84,7 +102,7 @@ getArticles : Cmd Msg
 getArticles =
   let
     url =
-      "http://localhost:3000/press"
+      "/press"
   in
     Task.perform FetchFail FetchSucceed (Http.get articlesDecoder url)
 
