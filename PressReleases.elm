@@ -10,16 +10,6 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 import Task
 
 
-main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-
 -- MODEL
 
 
@@ -126,3 +116,13 @@ articleDecoder =
         |> Json.Decode.Pipeline.required "title" Json.string
         |> Json.Decode.Pipeline.required "body" Json.string
         |> optional "link" Json.string ""
+
+
+
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
